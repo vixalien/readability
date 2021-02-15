@@ -260,6 +260,10 @@ function read(html, options, callback) {
           window.document.originalURL = null;
         }
 
+        // Fix highlighted code blocks
+        Array.from(window.document.querySelectorAll('code'))
+          .map(element => element.textContent = element.textContent)
+
         if (errors) {
           window.close();
           return callback(errors);
