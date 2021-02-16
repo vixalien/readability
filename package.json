@@ -22,9 +22,9 @@
     }
   ],
   "dependencies": {
-    "encoding": "~0.1.7",
-    "jsdom": "^9.12.0",
-    "minimist": "^1.2.0",
+    "encoding": "^0.1.13",
+    "jsdom": "^16.0.0",
+    "minimist": "^1.2.5",
     "node-fetch": "^2.6.1"
   },
   "engines": {
