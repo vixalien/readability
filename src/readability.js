@@ -251,40 +251,38 @@ function read(html, options, callback) {
 
     if (typeof body !== 'string') body = body.toString();
     if (!body) return callback(new Error('Empty story body returned from URL'));
-    jsdom.env({
-      html: body,
-      done: function(errors, window) {
-        if (meta) {
-          window.document.originalURL = meta.request.uri.href;
-        } else {
-          window.document.originalURL = null;
-        }
+    try {
+      const { window } = new jsdom.JSDOM(body);
 
-        // Fix highlighted code blocks
-        Array.from(window.document.querySelectorAll('code'))
-          .map(element => element.textContent = element.textContent)
-
-        if (errors) {
-          window.close();
-          return callback(errors);
-        }
-        if (!window.document.body) {
-          window.close();
-          return callback(new Error('No body tag was found.'));
-        }
-
-        try {
-          var readability = new Readability(window, options);
-
-          // add meta information to callback
-          callback(null, readability, meta);
-        } catch (ex) {
-          window.close();
-          return callback(ex);
-
-        }
+      if (meta) {
+        window.document.originalURL = meta.request.uri.href;
+      } else {
+        window.document.originalURL = null;
       }
-    });
+
+      // Fix highlighted code blocks
+      Array.from(window.document.querySelectorAll('code'))
+        .map(element => element.textContent = element.textContent)
+
+      if (!window.document.body) {
+        window.close();
+        return callback(new Error('No body tag was found.'));
+      }
+
+      try {
+        var readability = new Readability(window, options);
+
+        // add meta information to callback
+        callback(null, readability, meta);
+      } catch (ex) {
+        window.close();
+        return callback(ex);
+
+      }
+    } catch {
+      window.close();
+      callback(errors);
+    }
   }
 }
 
